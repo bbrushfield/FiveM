@@ -1,0 +1,15 @@
+https://discordapp.com/oauth2/authorize?client_id=777204259317088266&scope=bot&permissions=8 
+
+777204259317088266 CLIENT ID  
+
+
+
+module.exports = {
+    name: "ping",
+    category: "info",
+    description: "Returns latency and API Ping",
+    run: async (client, message, args) => {
+
+    }
+}
+

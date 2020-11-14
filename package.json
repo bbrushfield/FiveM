@@ -1,0 +1,28 @@
+{
+  "name": "bbrp",
+  "version": "1.0.0",
+  "description": "BBRP Bot for FiveM",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "\u0016https://github.com/bbrushfield/BBRP.git"
+  },
+  "keywords": [
+    "BBRP"
+  ],
+  "author": "AyeeMod",
+  "license": "ISC",
+  "dependencies": {
+    "ascii-table": "0.0.9",
+    "common-tags": "^1.8.0",
+    "discord.js": "^12.4.1",
+    "dotenv": "^8.2.0",
+    "fs": "0.0.1-security",
+    "gamedig": "^2.0.23",
+    "http": "0.0.1-security",
+    "steamapi": "^2.1.2"
+  }
+}
