@@ -20,15 +20,26 @@ module.exports = {
             embed.setColor("RANDOM")
             embed.setDescription("Please see below a list of current online players!")
             embed.setFooter("Server Player lookup - FiveM Bot developed by AyeeMod#0001")
-            for (i = 0; i < state.players.length; i++) {
-                //console.log(state.players[i].name)
-                //console.log(state.raw.players)
-                const playersobj = state.raw.players[i].identifiers
+            if (state.players.length == 0){
+                console.log("No players")
+                const noplrembed = new Discord.MessageEmbed()
+                noplrembed.setTitle("There are no Players currently on the server!")
+                noplrembed.setDescription("Please try again later, when there may be players on!")
+                noplrembed.setColor("RED")
+                noplrembed.setFooter("Player Function - FiveM Bot developed by AyeeMod#0001")
+                message.channel.send(noplrembed)
+            } else {
+                console.log("Players!")
+                for (i = 0; i < state.players.length; i++) {
+                    //console.log(state.players[i].name)
+                    //console.log(state.raw.players)
+                    const playersobj = state.raw.players[i].identifiers
 
-                //const currentuser = client.fetchUser(state.raw.players[i].identifiers[5])
-                embed.addField(`${state.raw.players[i].name}`,`Server ID: ${state.raw.players[i].id}\nPing: ${state.players[i].ping}ms`,true)
+                    //const currentuser = client.fetchUser(state.raw.players[i].identifiers[5])
+                    embed.addField(`${state.raw.players[i].name}`,`Server ID: ${state.raw.players[i].id}\nPing: ${state.players[i].ping}ms`,true)
+                }
+                message.channel.send(embed)
             }
-            message.channel.send(embed)
         //}).catch((error) => {
            // console.log("Server is offline");
         });

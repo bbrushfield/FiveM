@@ -47,48 +47,59 @@ module.exports = {
             host: 'main.bbrp.cloud'
         }).then((state) => {
             console.log(state)
-            for (i = 0; i < state.raw.players.length; i++) {
-                //console.log(state.players[i].name)
-                //console.log(state.raw.players)
-                const stateplayers = state.raw.players[i].name
-                const playersvar = state.raw.players
-                const statelower = state.raw.players[i].name.toLowerCase()
-                if (statelower.includes(args[0].toLowerCase())) {
-                    async function asyncCall() {
-                        const embed = new Discord.MessageEmbed()
-                        embed.setTitle(`Player Information: ${state.raw.players[i].name}`)
-                        embed.setColor("RANDOM")
-                        embed.setFooter("Active Player Search - FiveM Bot developed by AyeeMod#0001")
-                        const playersobj = state.raw.players[i].identifiers
-                        //Discord Information Identification
-                        for (v = 0; v < playersobj.length; v++) {
-                            if (playersobj[v].includes("discord")){ 
-                                const iddisc = playersobj[v].replace("discord:","") //Removes "discord:" from string
-                                const result = await client.users.fetch(iddisc);
-                                embed.addField(`Discord Information`,`Username: ${result.username}#${result.discriminator}\nUser ID: ${result.id}`)
-                            } else if (playersobj[v].includes('steam')) {
-                                embed.addField(`Steam Information`,`Steam Account Verified:\n${state.raw.players[i].name}`)
+            if (state.raw.players.length === 0){
+                console.log("No players")
+                const noplrembed = new Discord.MessageEmbed()
+                noplrembed.setTitle("There are no Players currently on the server!")
+                noplrembed.setDescription("Please try again later, when there may be players on!")
+                noplrembed.setColor("RED")
+                noplrembed.setFooter("FiveM Bot developed by AyeeMod#0001")
+                message.channel.send(noplrembed)
+            } else {
+                console.log("Players!")
+                for (i = 0; i < state.raw.players.length; i++) {
+                    //console.log(state.players[i].name)
+                    //console.log(state.raw.players)
+                    const stateplayers = state.raw.players[i].name
+                    const playersvar = state.raw.players
+                    const statelower = state.raw.players[i].name.toLowerCase()
+                    if (statelower.includes(args[0].toLowerCase())) {
+                        async function asyncCall() {
+                            const embed = new Discord.MessageEmbed()
+                            embed.setTitle(`Player Information: ${state.raw.players[i].name}`)
+                            embed.setColor("RANDOM")
+                            embed.setFooter("Active Player Search - FiveM Bot developed by AyeeMod#0001")
+                            const playersobj = state.raw.players[i].identifiers
+                            //Discord Information Identification
+                            for (v = 0; v < playersobj.length; v++) {
+                                if (playersobj[v].includes("discord")){ 
+                                    const iddisc = playersobj[v].replace("discord:","") //Removes "discord:" from string
+                                    const result = await client.users.fetch(iddisc);
+                                    embed.addField(`Discord Information`,`Username: ${result.username}#${result.discriminator}\nUser ID: ${result.id}`)
+                                } else if (playersobj[v].includes('steam')) {
+                                    embed.addField(`Steam Information`,`Steam Account Verified:\n${state.raw.players[i].name}`)
+                                }
                             }
-                        }
-                        //For LEO / FD / CIV Identification:
-                        const searchtype = SearchType(stateplayers)
-                        if (searchtype == "SAHP") {
-                            embed.addField("Identification Type",`Type: LEO\nUnit: San Andreas Highway Patrol`)
-                        } else if (searchtype == "BCSO") {
-                                embed.addField("Identification Type","Type: LEO\nUnit: Blaine County Sherriff's Office")
-                        } else if (searchtype == "FD") {
-                            embed.addField("Identification Type","Type: FD\nUnit: Fire Department")
-                        } else if (searchtype == "CIV") {
-                            embed.addField("Identification Type","Type: CIV/DPS\nIdent: Civillian / Other")
-                        };
-                    message.channel.send(embed)
-                }
-                    asyncCall()
-                    return; //NOTE: Keep this return at the bottom of the if statement AT ALL TIMES
-                }
+                            //For LEO / FD / CIV Identification:
+                            const searchtype = SearchType(stateplayers)
+                            if (searchtype == "SAHP") {
+                                embed.addField("Identification Type",`Type: LEO\nUnit: San Andreas Highway Patrol`)
+                            } else if (searchtype == "BCSO") {
+                                    embed.addField("Identification Type","Type: LEO\nUnit: Blaine County Sherriff's Office")
+                            } else if (searchtype == "FD") {
+                                embed.addField("Identification Type","Type: FD\nUnit: Fire Department")
+                            } else if (searchtype == "CIV") {
+                                embed.addField("Identification Type","Type: CIV/DPS\nIdent: Civillian / Other")
+                            };
+                        message.channel.send(embed)
+                    }
+                        asyncCall()
+                        return; //NOTE: Keep this return at the bottom of the if statement AT ALL TIMES
+                    }
 
+                }
+                ErrorEmbed(message)
             }
-            ErrorEmbed(message)
         });
     }
 };
