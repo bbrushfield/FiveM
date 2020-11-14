@@ -46,14 +46,13 @@ module.exports = {
             type: 'fivem',
             host: 'main.bbrp.cloud'
         }).then((state) => {
-            console.log(state)
             if (state.raw.players.length === 0){
                 console.log("No players")
                 const noplrembed = new Discord.MessageEmbed()
                 noplrembed.setTitle("There are no Players currently on the server!")
                 noplrembed.setDescription("Please try again later, when there may be players on!")
                 noplrembed.setColor("RED")
-                noplrembed.setFooter("FiveM Bot developed by AyeeMod#0001")
+                noplrembed.setFooter("Search Function - FiveM Bot developed by AyeeMod#0001")
                 message.channel.send(noplrembed)
             } else {
                 console.log("Players!")
