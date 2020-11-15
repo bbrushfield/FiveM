@@ -23,6 +23,8 @@
     "fs": "0.0.1-security",
     "gamedig": "^2.0.23",
     "http": "0.0.1-security",
+    "moment": "^2.29.1",
+    "moment-duration-format": "^2.3.2",
     "steamapi": "^2.1.2"
   }
 }
