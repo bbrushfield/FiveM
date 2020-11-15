@@ -54,7 +54,13 @@ module.exports = {
                 noplrembed.setColor("RED")
                 noplrembed.setFooter("Search Function - FiveM Bot developed by AyeeMod#0001")
                 message.channel.send(noplrembed)
-            } else {
+            } else if (args.length == 0) {
+                const argsembed = new Discord.MessageEmbed()
+                argsembed.setTitle("You have not provided any player name!")
+                argsembed.setDescription("Please provide a player name. If you do not know the active players, please use the player command")
+                argsembed.setColor("RED")
+                argsembed.setFooter("Search Function - FiveM Bot developed by AyeeMod#0001")
+            }else {
                 console.log("Players!")
                 for (i = 0; i < state.raw.players.length; i++) {
                     //console.log(state.players[i].name)
