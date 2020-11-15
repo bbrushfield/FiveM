@@ -2,9 +2,12 @@ const { EEXIST } = require('constants');
 const Discord = require('discord.js');
 const { stat } = require('fs');
 const SteamAPI = require('steamapi')
+const Gamedig = require('gamedig');
+
 const SAHParr = ['1K',"2K","3K","4K"]
 const BCSOarr = ["1C","2C","3C","4C"]
 const FDarr = ["1F","2F","3F","4F"]
+
 function ErrorEmbed(message){
     const errorembed = new Discord.MessageEmbed()
     errorembed.setTitle("Uh Oh! Player Search Failed!")
@@ -41,7 +44,6 @@ module.exports = {
     description: "Returns player count on Servers. Specify which server you want to view. Default is main server",
     usage: "search <Username>",
     run: async (client, message, args) => {
-        const Gamedig = require('gamedig');
         Gamedig.query({
             type: 'fivem',
             host: 'main.bbrp.cloud'

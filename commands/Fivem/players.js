@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { stat } = require('fs');
-
+const Gamedig = require('gamedig');
 
 module.exports = {
     name: "players",
@@ -9,7 +9,6 @@ module.exports = {
     description: "Returns player count on Servers. Specify which server you want to view. Default is main server",
     usage: "players [SERVER]",
     run: async (client, message, args) => {
-        const Gamedig = require('gamedig');
         Gamedig.query({
             type: 'fivem',
             host: 'main.bbrp.cloud'
