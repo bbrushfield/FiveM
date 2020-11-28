@@ -41,6 +41,14 @@ module.exports = {
             }
         //}).catch((error) => {
            // console.log("Server is offline");
+        }).catch((error) => {
+            console.log('Server offline')
+            const offlineembed = new Discord.MessageEmbed()
+            offlineembed.setTitle("The server is currently offline!")
+            offlineembed.setDescription("Please wait for the server to be restarted")
+            offlineembed.setColor("RED")
+            offlineembed.setFooter("Player Function - FiveM Bot developed by AyeeMod#0001")
+            message.channel.send(offlineembed)
         });
     }
 };

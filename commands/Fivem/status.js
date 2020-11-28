@@ -23,12 +23,11 @@ module.exports = {
             errembed.setFooter("Satus Window - FiveM Bot developed by AyeeMod#0001")
             message.channel.send(errembed)
         }).catch((error) => {
-            const errembed = new Discord.MessageEmbed()
-            errembed.setTitle("Server is currently Offline!")
-            errembed.setDescription(`Server IP: main.bbrp.cloud\nPlayers: --\nUptime: --`)
-            errembed.setColor("RED")
-            errembed.setFooter("Satus Window - FiveM Bot developed by AyeeMod#0001")
-            message.channel.send(errembed)
+            const errorembed = new Discord.MessageEmbed()
+            errorembed.setColor("RED")
+            errorembed.setTitle(`Failed to connect to server`)
+            errorembed.setDescription('Server `main.bbrp.cloud` appears to be offline!')
+            errorembed.setFooter(`Failed to connect to server - FiveM Bot developed by AyeeMod#0001`)
         })
     }
 

@@ -1,3 +1,6 @@
 {
-    "prefix": ">"
+    "prefix": ">",
+    "serverhost": "main.bbrp.cloud",
+    "ServerName": "Backbone Roleplay"
+    
 }

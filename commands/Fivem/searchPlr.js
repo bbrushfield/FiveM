@@ -7,13 +7,14 @@ const Gamedig = require('gamedig');
 const SAHParr = ['1K',"2K","3K","4K"]
 const BCSOarr = ["1C","2C","3C","4C"]
 const FDarr = ["1F","2F","3F","4F"]
+const server = 'main.bbrp.cloud'
 
-function ErrorEmbed(message){
+function ErrorEmbed(message,optionalmsg){
     const errorembed = new Discord.MessageEmbed()
     errorembed.setTitle("Uh Oh! Player Search Failed!")
     errorembed.setColor("RED")
     errorembed.setDescription("Sorry! The player you searched could not be found to be active in the server.\n**PLEASE NOTE:** *You cannot search for a player not currently active on the server!*")
-    errorembed.addField("If you believe this is wrong, please retry or contact an Administrator!",`Error: PlrInvalidErr`)
+    errorembed.addField("If you believe this is wrong, please retry or contact an Administrator!",`Error: ${optionalmsg}`)
     errorembed.setFooter("Player Search Error Window - FiveM Bot developed by AyeeMod#0001")
     message.channel.send(errorembed)
 }
@@ -46,7 +47,7 @@ module.exports = {
     run: async (client, message, args) => {
         Gamedig.query({
             type: 'fivem',
-            host: 'main.bbrp.cloud'
+            host: server
         }).then((state) => {
             if (state.raw.players.length === 0){
                 console.log("No players")
@@ -105,8 +106,10 @@ module.exports = {
                     }
 
                 }
-                ErrorEmbed(message)
+                ErrorEmbed(message,'INT-002 - Non urgent')
             }
+        }).catch((error) => {
+           ErrorEmbed(message,'INT-001 - This is an internal error. Please contact an administrator immidiately')
         });
     }
 };
