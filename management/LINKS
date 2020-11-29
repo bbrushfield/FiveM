@@ -13,3 +13,7 @@ module.exports = {
     }
 }
 
+MongoDB:
+Database login Info:
+Username: BBRP
+Password: BBRPManager
