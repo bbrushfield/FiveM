@@ -2,13 +2,13 @@ const botconfig = require("./management/botconfig.json");
 const { Client, RichEmbed, Collection } = require("discord.js");
 const fs = require("fs");
 const http = require('http');
+const { token } = require('./config')
 require ('dotenv/config');
 const port = process.env.PORT || 3000; // Find the PORT or port 3000 if not
 //This is a simple server
 http.createServer().listen(port); // Allows the connection of the bot to the heroku server
-const drp = require('discord-rich-presence')('180984871685062656');
+//const drp = require('discord-rich-presence')('180984871685062656');
 const prefix = botconfig.prefix;
-const token = process.env.TOKEN;
 
 //Allows the bot to mention.
 const client = new Client({
@@ -21,10 +21,11 @@ client.aliases = new Collection();
 
 client.categories = fs.readdirSync("./commands/");
 
-
 ["command"].forEach(handler => {
     require(`./handlers/${handler}`)(client);
 });
+
+//client.mongoose = require('./Utils/mongo')
 
 
 client.on("ready", () => {
@@ -57,4 +58,5 @@ client.on('error', err => {
     console.log(err);
 })
 // Runs the bot when node . (. meaning current file) is run.
+//client.mongoose.init();
 client.login(token);
