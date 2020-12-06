@@ -14,15 +14,27 @@ let IncArgs = ['Incorrect Arguments!','Please specify if you are logging ON or O
 
 
 function ErrorEmbed(message,title,description,text){
-    const errembed = new Discord.MessageEmbed()
-    .setColor('RED')
-    .setTitle(title)
-    .setDescription(description)
-    .setFooter(autofooter)
-    if (text != 0) {
-        errembed.addField('Additional Text',text)
+    if (title == 'User Account Created!'){
+        const accCreated = new Discord.MessageEmbed()
+        .setColor('GREEN')
+        .setTitle(title)
+        .setDescription(description)
+        .setFooter(autofooter)
+        if (text != 0) {
+            accCreated.addField('Additional Text',text)
+        }
+        message.channel.send(accCreated)
+    } else {    
+        const errembed = new Discord.MessageEmbed()
+        .setColor('RED')
+        .setTitle(title)
+        .setDescription(description)
+        .setFooter(autofooter)
+        if (text != 0) {
+            errembed.addField('Additional Text',text)
+        }
+        message.channel.send(errembed)
     }
-    message.channel.send(errembed)
 }
 
 //On conclusion of patrol (patrol off [notes])
@@ -38,32 +50,15 @@ function ConcEmbed(message,title,description,text){
     message.channel.send(concembed)
 }
 
-function newlog(message,status,notesargs){
-    if (status == "LOGON") {
-        const logobj = {
-            author: message.member.user.tag,
-            timestamp: new Date().getTime(),
-            reason: notesargs
-        }
-        return logobj;
-    } else if (status == "LOGOFF") {
-        const logobj = {
-            author: message.member.user.tag,
-            timestamp: new Date().getTime(),
-            reason: notesargs
-        }
-        return logobj;
-    } else if (status == "UNK") {
-        const logobj = {
-            author: message.member.user.tag,
-            timestamp: new Date().getTime(),
-            reason: notesargs
-        }
-        return logobj;
-    } else {
-        ErrorEmbed(message,'Error - Bot End','Please contact a Developer ASAP','Create a ticket by going to #support-ticket')
-        return;
-    }
+function unix_get(unix){
+    var date = new Date(unix);
+
+    var hours = date.getHours();
+    var minutes = '0' + date.getMinutes();
+    var seconds = '0' + date.getSeconds();
+
+    var formatted = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+    return formatted
 }
 
 
@@ -91,14 +86,12 @@ module.exports = {
                 ErrorEmbed(message,IncArgs[0],IncArgs[1],IncArgs[2]); return;
             }
         } else {
-            return message.reply("Please supply either 'On' or 'Off', or supply notes")
+            return message.reply("Please supply either 'On' or 'Off' followed by notes to begin / end a patrol!")
         }
         let userId = message.author.id
-        //TEMPORARY! REMOVE WHEN GLOBAL USE
-        if (message.author.id != '129495170390556672') return;
         let notesforpush = args.slice(1).join(" ")
 
-            function getDate(timestamp){
+            function getDate(){
                 var date = new Date();
 
                 var hours = date.getHours();
@@ -111,7 +104,7 @@ module.exports = {
                 return formatted
             }
             await mongo().then(async mongoose => {
-                const theresult = await LogSchema.findOne({ userId: userId}).exec();
+                const theresult = await LogSchema.findOne({ userId: userId }).exec();
                 if(theresult !== null){
                     var currentstate = theresult.status
                     //status false means logged off
@@ -119,16 +112,21 @@ module.exports = {
                 }
 
                 if(currentstate == false){
-                    if(status_user == true){
-                        return ErrorEmbed(message,'You are already logged out!','Please log back in if you wish to start a patrol!')
+                    if(status_user == false){
+                        //If user is the opposite of the requested function, in this case, wanting to log out when already logged out
+                        return ErrorEmbed(message,'You are already logged out!','Please log back in if you wish to start a patrol!','To start a patrol, just do log [on] [Notes]')
                     }
-                    var Total_Patrols = theresult.Total_Patrols + 1
-                    var Total_Time = 0
+                    //Start variable definitions for LOGGING ON
+                    var Total_Time = theresult.Total_Time
+                    var Total_Patrols = theresult.Total_Patrols
+                    
                     const logon = {
                         author: message.member.user.tag,
                         timestamp: new Date().getTime(),
                         notes_start: notesforpush
                     }
+
+                    //End variable definitions for LOGGING ON
                     try {
                         await LogSchema.findOneAndUpdate({
                             userId
@@ -136,9 +134,9 @@ module.exports = {
                             userId,
                             Total_Time,
                             Total_Patrols,
+                            status: true,
                             $push: {
                                 On_Logs: logon,
-                                status: true
                             }
                         }, {
                             upsert: true
@@ -146,29 +144,28 @@ module.exports = {
                     } finally {
                         mongoose.connection.close()
                     }
-                    console.log('Trying to log on')
-                    ConcEmbed(message,'Log on Successful!',`Log Summary:\n Request by: ${message.member.user.tag}\nLog on time: \nLog off time: ${getDate()}\nNotes Provided: ${logon.notes_start}`,0)
+                    //Send message to user to confirm logging
+                    ConcEmbed(message,'Log on Successful!',`Log Summary:\n Request by: ${message.member.user.tag}\nLog on time:${getDate()}\nNotes Provided: ${logon.notes_start}`,0)
                 } else if(currentstate == true){
-                    if(status_user == false){
-                        return ErrorEmbed(message,'You are already logged out!','Please log back in if you wish to start a patrol!')
+                    if(status_user == true){
+                        //If user is the opposite of the requested function, in this case, wanting to log on when already logged on
+                        return ErrorEmbed(message,'You are already logged out!','Please log back in if you wish to start a patrol!','To end a patrol, just do log [off] [Notes]')
                     }
+                    //Start variable definitions for logging OFF
                     const logoff = {
                         author: message.member.user.tag,
                         timestamp: new Date().getTime(),
                         notes_end: notesforpush
                     }
                     const logSummary = {
-                        TotalTimeOnPatrol: 0,
+                        TotalTimeOnPatrol: new Date().getTime() - theresult.On_Logs[theresult.Total_Patrols].timestamp,
                     }
+                    var Total = new Date().getTime() - theresult.On_Logs[theresult.Total_Patrols].timestamp
+                    var Total_Time = theresult.Total_Time + Total
 
-                    // Push to logs, ALSO PUSH UPDATED TIME TO MAIN
-                    console.log('Trying to log off')
-                    console.log('t')
-
-                //Required definitions if no log found
-                    var Total_Time = 0
-                    var Total_Patrols = 0
-                    var status = false;
+                    var Total_Patrols = theresult.Total_Patrols + 1
+                    const currenttot = theresult.Total_Patrols
+                    //End variable defintions for logging OFF
                     try {
                         await LogSchema.findOneAndUpdate({
                             userId
@@ -176,16 +173,16 @@ module.exports = {
                             userId,
                             Total_Time,
                             Total_Patrols,
+                            status: false,
                             $push: {
                                 Off_Logs: logoff,
                                 Total_Logs: logSummary,
-                                status: false,
                             }
                         }, {
                             upsert: true
                         })
-                    const currenttot = theresult.Total_Patrols
-                    ConcEmbed(message,'Log off Successful!',`Log Summary:\n Request by: ${message.member.user.tag}\nLog on time: ${theresult.On_Logs[currenttot].timestamp} \nLog off time: ${getDate()}\nNotes Provided: ${logoff.notes_end}`,0)
+                    const formatted = unix_get(theresult.On_Logs[currenttot].timestamp)
+                    ConcEmbed(message,'Log off Successful!',`Log Summary:\n Request by: ${message.member.user.tag}\nLog on time: ${formatted} \nLog off time: ${getDate()}\nNotes Provided at start: ${theresult.On_Logs[currenttot].notes_start}\nNotes provided at end: ${logoff.notes_end}`,0)
                     } finally {
                         mongoose.connection.close()
                     }
@@ -199,45 +196,18 @@ module.exports = {
                             userId
                         }, {
                             userId,
-                            status,
                             Total_Time,
                             Total_Patrols,
+                            status,
                         }, {
                             upsert: true
                         })
-                    ErrorEmbed(message,'You have had an account created!','Please re-do your previous command to begin patrol!')
+                    ErrorEmbed(message,'User Account Created!','Please re-do your previous command to begin patrol!','This error is constant when someone first logs in!')
                     } finally {
                         mongoose.connection.close()
                     }
                 }
             })
-        console.log('test')
     }
 };
 
-
-function embed(){
-    const embed = new Discord.MessageEmbed()
-        .setColor('#0099ff')
-        .setTitle('Back Bone Chain Of Command')
-        .setAuthor('Back Bone Roleplay')
-        .setDescription('Please see below the Chain Of Command')
-        .addFields(
-            { name: 'Server Director', value: 'C. Orlando, L. Hexwood '},
-            { name: 'Executive Staff', value: '⠀'},
-            { name: 'Head Of Staff', value: 'M. Lake'},
-            { name: 'Head Of Administration', value: 'C. Wolf'},
-            { name: 'Head Of Department Transfer', value: 'R. Ceritano'},
-            { name: 'Head Of Server Media', value: 'C. Kane'},
-            { name: 'Head Of MDT', value: 'H. Strange'},
-            { name: 'Head of Development', value: 'X. Henry'},
-            { name: 'Staff Team', value: '⠀⠀'},
-            { name: 'Trial Staff', value: 'N/A'},
-            { name: 'Development Team', value: '(Not In Chain Of Command'},
-            { name: 'Head of Development', value: 'X. Henry'},
-            { name: 'Script Developer', value: 'J. Johansson'},
-            { name: 'Lead Discord Developer', value: 'H. Strange'},
-        )
-        .setTimestamp()
-        .setFooter('Backbone Chain Of Command')
-    }

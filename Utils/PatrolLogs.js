@@ -23,7 +23,7 @@ const LogSchema = mongoose.Schema({
         required: true,
     },
     status: {
-        type: Boolean
+        type: Boolean,
     }
 })
 
